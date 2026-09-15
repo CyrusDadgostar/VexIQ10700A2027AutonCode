@@ -10,15 +10,15 @@
 int EncoderDifference(MotorData data)
 {
 
-	return nMotorEncoder[data.motorPort]-data.previousEncoderValue;
+	return data.motorPort.rotation()-data.previousEncoderValue;
 }
 
 void trackVelocity(MotorData data)
 {
-	if(time1[T1] - data.previousTime >= UPDATE_CYCLE_IN_MILLISECONDS)
+	if(time1.time(msec) - data.previousTime >= UPDATE_CYCLE_IN_MILLISECONDS)
 	{
 		data.velocity = (float)(EncoderDifference(data)*40.0);
-		data.previousEncoderValue = nMotorEncoder[data.motorPort];
+		data.previousEncoderValue = data.motorPort.position();
 		data.previousTime = time1[T1];
 	}
 }
@@ -48,7 +48,7 @@ bool initiateStall(MotorData& motorData)
 		if(abs(motorData.velocity) > startStallCheckThreshold)// also make it an and so that after it passes a certain velocity (1) it should then initiate
 		{
 			motorData.stallData.isInitiated = true;
-			motorData.stallData.previousTime = time1[T3];
+			motorData.stallData.previousTime = time3.time(msec);
 			motorData.stallData.isPassed = true;
 		}
 	}
@@ -64,7 +64,7 @@ void realTime()
 {
 
 	int mask = INTERVAL - 1;
-	int timeRemainder = mask & time1[T3];
+	int timeRemainder = mask & time3.time(msec);
 	delay(INTERVAL - timeRemainder);
 }
 

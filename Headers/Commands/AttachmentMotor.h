@@ -35,16 +35,16 @@ void configure(MoveAttachMotorData* data)
 	BaseCommand* command = &bot.commands[bot.index];
 	memcpy(command, data, sizeof(MoveAttachMotorData));
 
-	nMotorEncoder[attachMotor] = 0;
+	bot.center.motorPort.setPosition(0);
 }
 
 bool hasRan(MoveAttachMotorData* data)
 {
-	if((unsigned)abs(nMotorEncoder[attachMotor]) >= data->duration)
+	if((unsigned)abs(bot.center.motorPort.position()) >= data->duration)
 	{
 		return true;
 	}
-	motor[attachMotor] = data->power;
+	bot.center.motorPort.spin(forward, data->power);
 
 
 	BaseCommand* command = &bot.commands[bot.index];
@@ -54,5 +54,5 @@ bool hasRan(MoveAttachMotorData* data)
 
 void cleanup(MoveAttachMotorData* data)
 {
-	motor[attachMotor] = 0;
+	bot.center.motorPort.stop();
 }

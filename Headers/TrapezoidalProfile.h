@@ -9,24 +9,24 @@
 
 //void resetEncoders(MotorData data)
 //{
-//	nMotorEncoder[data.motorPort] = 0;
+//	data.motorPort.rotation() = 0;
 //}
 
 void resetCurrentPosition(MotorData& data)
 {
-	data.profile.previousPosition = nMotorEncoder[data.motorPort];
+	data.profile.previousPosition = data.motorPort.position();
 	writeDebugStreamLine("Previous Position: %i", data.profile.previousPosition);
 
 }
 
 int getcurrentPosition(MotorData& data)
 {
-	return nMotorEncoder[data.motorPort]-data.profile.previousPosition;
+	return data.motorPort.position()-data.profile.previousPosition;
 }
 
 bool accelerate(MotorData& data)
 {
-	int realEncoder = nMotorEncoder[data.motorPort];
+	int realEncoder = data.motorPort.position();
 	writeDebugStreamLine("Real: %i", realEncoder);
 	int currentPosition = getcurrentPosition(data);
 	if(abs(currentPosition) >= abs(data.profile.accDuration))
@@ -40,7 +40,7 @@ bool accelerate(MotorData& data)
 
 	power = abs(power) * sgn(data.profile.totalDuration);
 
-	motor[data.motorPort] = power;
+	data.motorPort.spin(power);
 
 
 	return false;
@@ -48,15 +48,13 @@ bool accelerate(MotorData& data)
 
 bool stayAtSameSpeed(MotorData& data)
 {
-	int realEncoder = nMotorEncoder[data.motorPort];
-	writeDebugStreamLine("Real: %i", realEncoder);
 	int currentPosition = getcurrentPosition(data);
 	int trapezoidalB1 = abs(data.profile.totalDuration)-data.profile.dccDuration;
 	if(abs(currentPosition) >= abs(trapezoidalB1))
 	{
 		return true;
 	}
-	motor[data.motorPort] = 100 * sgn(data.profile.totalDuration);
+	data.motorPort.spin(100 * sgn(data.profile.totalDuration));
 	return false;
 }
 
@@ -76,7 +74,6 @@ bool decelerate(MotorData& data)
 
 	int adjustedPosition = (abs(data.profile.totalDuration) - DECELERATION_DURATION) - abs(currentPosition);
 	int target = (abs(data.profile.totalDuration)-DECELERATION_DURATION);
-	writeDebugStreamLine("adjusted: %i", adjustedPosition);
 	int percentageValue = data.profile.maxPower - MIN_POWER;
 
 	int power = ((1-abs(adjustedPosition)/(float)DECELERATION_DURATION)*percentageValue)+MIN_POWER;
@@ -85,7 +82,7 @@ bool decelerate(MotorData& data)
 
 	power = abs(power) * direction;
 
-	motor[data.motorPort] = power;
+	data.motorPort.spin(power);
 
 
 	return false;
@@ -99,7 +96,7 @@ Trap profile is very disorganized.
 pull this into it's own program.
 */
 
-bool initTrapezoidalProfileData(MotorData& data, short totalDuration, tMotor motorPort, TrapezoidalStates state)
+bool initTrapezoidalProfileData(MotorData& data, short totalDuration, vex::motor motorPort, TrapezoidalStates state)
 {
 	data.profile.state = state;
 	data.motorPort = motorPort;
@@ -119,10 +116,6 @@ void motorDataChecksAndProcedures(MotorData data)
 
 
 	}
-	if(data.profile.totalDuration == 0)
-	{
-		//smartzero
-	}
 }
 
 bool runMotorData(MotorData data)
@@ -132,8 +125,6 @@ bool runMotorData(MotorData data)
 		case Acc:
 		{
 			bool isDone = accelerate(data);
-			writeDebugStreamLine("%i", data.motorPort);
-			writeDebugStreamLine("ACC");
 			if(isDone)
 			{
 				data.profile.state = Coast;
@@ -145,7 +136,6 @@ bool runMotorData(MotorData data)
 		case Coast:
 		{
 			bool isDone = stayAtSameSpeed(data);
-			writeDebugStreamLine("CCC");
 			if(isDone)
 			{
 				data.profile.state = Dcc;
@@ -157,11 +147,9 @@ bool runMotorData(MotorData data)
 		case Dcc:
 		{
 			bool isDone = decelerate(data);
-			writeDebugStreamLine("DCC");
 			if(isDone)
 			{
 				data.stallData.isInitiated = false;
-				writeDebugStreamLine("ENNNNNNNNNNNDDDDDDDDDDDEDDDDDD");
 				return true;
 			}
 		}

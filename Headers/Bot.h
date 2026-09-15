@@ -1,11 +1,35 @@
 #include "BaseCommand.h"
 
+int sgn(float val) {
+    return (0 < val) - (val < 0);
+}
+
 enum TrapezoidalStates
 {
 	Acc,
 	Coast,
 	Dcc
 };
+
+struct vexMotorGroup
+{
+	vex::motor firstMotor;
+	vex::motor secondMotor;
+	void spin(int power)
+	{
+		firstMotor.spin(forward, power);
+		secondMotor.spin(forward, power);
+	}
+	float position()
+	{
+		return (firstMotor.position() + secondMotor.position())/2
+	}
+	void setPosition(int position)
+	{
+		firstMotor.setPosition(position);
+		secondMotor.setPosition(position);
+	}
+}
 
 struct StallData
 {
@@ -27,7 +51,7 @@ struct TrapData
 
 struct MotorData
 {
-	tMotor motorPort;
+	vexMotorGroup motorPort;
 	TrapData profile;
 	int previousEncoderValue;
 	float velocity;
@@ -46,5 +70,9 @@ struct Bot
 	MotorData right;
 	MotorData center;
 };
+
+timer time1 = timer();
+timer time2 = timer();
+timer time3 = timer();
 
 Bot bot;
