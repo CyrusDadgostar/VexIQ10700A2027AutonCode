@@ -15,28 +15,60 @@ struct vexMotorGroup
 {
 	vex::motor firstMotor;
 	vex::motor secondMotor;
+
+	vexMotorGroup() : firstMotor(), secondMotor() {}
+	vexMotorGroup(vex::motor firstMotor, vex::motor secondMotor)
+		: firstMotor(firstMotor), secondMotor(secondMotor)
+	{
+	}
+
+	void stopMotors()
+	{
+		firstMotor.stop();
+		secondMotor.stop();
+	}
+	void stop()
+	{
+		stopMotors();
+	}
+	void spinMotors(int power)
+	{
+		firstMotor.spin((vex::directionType)forward, power, pct);
+		secondMotor.spin((vex::directionType)forward, power, pct);
+	}
 	void spin(int power)
 	{
-		firstMotor.spin(forward, power);
-		secondMotor.spin(forward, power);
+		spinMotors(power);
+	}
+	float positionOfMotors()
+	{
+		return (firstMotor.position(degrees) + secondMotor.position(degrees))/2;
 	}
 	float position()
 	{
-		return (firstMotor.position() + secondMotor.position())/2
+		return positionOfMotors();
+	}
+	float rotation()
+	{
+		return positionOfMotors();
+	}
+	void setPositionOfMotors(int position)
+	{
+		firstMotor.setPosition(position, degrees);
+		secondMotor.setPosition(position, degrees);
 	}
 	void setPosition(int position)
 	{
-		firstMotor.setPosition(position);
-		secondMotor.setPosition(position);
+		setPositionOfMotors(position);
 	}
-}
+};
 
 struct StallData
 {
 	int previousTime;
 	bool isInitiated;
 	bool isPassed;
-}
+};
 
 struct TrapData
 {
@@ -44,10 +76,10 @@ struct TrapData
 	short accDuration;
 	short dccDuration;
 	short totalDuration;
-	byte maxPower;
+	short maxPower;
 	TrapezoidalStates state;
 	bool isConfigured;
-}
+};
 
 struct MotorData
 {

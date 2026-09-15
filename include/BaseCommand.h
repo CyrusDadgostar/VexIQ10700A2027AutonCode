@@ -1,3 +1,9 @@
+#include <cassert>
+
+#ifndef VERIFY
+#define VERIFY(condition) do { if (!(condition)) { assert(#condition && false); } } while (0)
+#endif
+
 enum CommandType
 {
 	MoveByDegrees = 0x00,

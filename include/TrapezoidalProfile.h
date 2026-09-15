@@ -1,4 +1,4 @@
-#pragma once
+
 #define MIN_POWER 5
 #define ACCELERATION_DURATION 250
 #define DECELERATION_DURATION 250
@@ -15,13 +15,13 @@
 void resetCurrentPosition(MotorData& data)
 {
 	data.profile.previousPosition = data.motorPort.position();
+	data.profile.isConfigured = true;
 	writeDebugStreamLine("Previous Position: %i", data.profile.previousPosition);
-
 }
 
 int getcurrentPosition(MotorData& data)
 {
-	return data.motorPort.position()-data.profile.previousPosition;
+	return data.motorPort.position() - data.profile.previousPosition;
 }
 
 bool accelerate(MotorData& data)
@@ -66,7 +66,7 @@ bool decelerate(MotorData& data)
 
 	if(abs(currentPosition) >= abs(data.profile.totalDuration))
 	{
-		motor[data.motorPort] = 0;
+		data.motorPort.stop();
 		return true;
 	}
 
@@ -96,29 +96,29 @@ Trap profile is very disorganized.
 pull this into it's own program.
 */
 
-bool initTrapezoidalProfileData(MotorData& data, short totalDuration, vex::motor motorPort, TrapezoidalStates state)
+bool initTrapezoidalProfileData(MotorData& data, short totalDuration, TrapezoidalStates state)
 {
 	data.profile.state = state;
-	data.motorPort = motorPort;
 	data.profile.totalDuration = totalDuration;
 	data.profile.accDuration = ACCELERATION_DURATION;
 	data.profile.dccDuration = DECELERATION_DURATION;
 	data.profile.maxPower = 100;
+	data.profile.previousPosition = data.motorPort.position();
+	data.profile.isConfigured = true;
 	return true;
 }
 
-void motorDataChecksAndProcedures(MotorData data)
+void motorDataChecksAndProcedures(MotorData& data)
 {
 	if(abs(data.profile.totalDuration) < data.profile.accDuration + data.profile.dccDuration)
 	{
-		data.profile.accDuration = ACCELERATION_DURATION*(abs(data.profile.totalDuration)/(float)(ACCELERATION_DURATION+DECELERATION_DURATION));
-		data.profile.dccDuration = abs(data.profile.totalDuration)-data.profile.accDuration;
-
-
+		float totalWindow = (float)(ACCELERATION_DURATION + DECELERATION_DURATION);
+		data.profile.accDuration = (short)(ACCELERATION_DURATION * (abs(data.profile.totalDuration) / totalWindow));
+		data.profile.dccDuration = (short)(abs(data.profile.totalDuration) - data.profile.accDuration);
 	}
 }
 
-bool runMotorData(MotorData data)
+bool runMotorData(MotorData& data)
 {
 	switch(data.profile.state)
 	{
@@ -129,7 +129,6 @@ bool runMotorData(MotorData data)
 			{
 				data.profile.state = Coast;
 			}
-
 		}
 			break;
 
@@ -140,7 +139,6 @@ bool runMotorData(MotorData data)
 			{
 				data.profile.state = Dcc;
 			}
-
 		}
 			break;
 
