@@ -32,12 +32,13 @@ void configure(RobotDrivetrainData* data)
 	if(data->isConfigured) return;
 
 	data->isConfigured = true;
-	initTrapezoidalProfileData(bot.left, data->leftDuration, data->leftState);
-	initTrapezoidalProfileData(bot.right, data->rightDuration, data->rightState);
-	motorDataChecksAndProcedures(bot.left);
-	motorDataChecksAndProcedures(bot.right);
-	resetCurrentPosition(bot.left);
-	resetCurrentPosition(bot.right);
+
+	initTrapezoidalProfileData((MotorData&)bot.left, data->leftDuration, data->leftState);
+	initTrapezoidalProfileData((MotorData&)bot.right, data->rightDuration, data->rightState);
+	motorDataChecksAndProcedures((MotorData&)bot.left);
+	motorDataChecksAndProcedures((MotorData&)bot.right);
+	resetCurrentPosition((MotorData&)bot.left);
+	resetCurrentPosition((MotorData&)bot.right);
 
 	BaseCommand* command = (BaseCommand*)&bot.commands[bot.index];
 	memcpy(command, data, sizeof(RobotDrivetrainData));
@@ -45,8 +46,8 @@ void configure(RobotDrivetrainData* data)
 
 bool hasRan(RobotDrivetrainData* data)
 {
-	bool isLeftDone = TrapezoidalProfileMoveByDegrees(bot.left);
-	bool isRightDone = TrapezoidalProfileMoveByDegrees(bot.right);
+	bool isLeftDone = TrapezoidalProfileMoveByDegrees((MotorData&)bot.left);
+	bool isRightDone = TrapezoidalProfileMoveByDegrees((MotorData&)bot.right);
 
 	if(isLeftDone && isRightDone)
 	{

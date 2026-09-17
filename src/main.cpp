@@ -1,4 +1,4 @@
-#include "vex.h"
+
 
 using namespace vex;
 
@@ -63,24 +63,24 @@ void createCommands()
 {
 	bot.index = 0;
 
-	for(int i = 0; i < 4; i++)
-	{
-		initMoveByDegreeData(distanceToDegrees(100), distanceToDegrees(100), Acc, Acc);
+	// for(int i = 0; i < 4; i++)
+	// {
+		// initMoveByDegreeData(distanceToDegrees(100), distanceToDegrees(100), (TrapezoidalStates)Acc, (TrapezoidalStates)Acc);
 
-			initMoveByDegreeData(100,100,Acc,Acc, true);
-			initMoveByDegreeData(-100,-100,Acc,Acc, true);
-			initMoveByDegreeData(100,100,Acc,Acc, true);
-			initMoveByDegreeData(-100,-100,Acc,Acc, true);
-			initStopRecData();
+			// initMoveByDegreeData(100,100,(TrapezoidalStates)Acc,(TrapezoidalStates)Acc, true);
+			// initMoveByDegreeData(-100,-100,(TrapezoidalStates)Acc,(TrapezoidalStates)Acc, true);
+			// initMoveByDegreeData(100,100,(TrapezoidalStates)Acc,(TrapezoidalStates)Acc, true);
+			// initMoveByDegreeData(-100,-100,(TrapezoidalStates)Acc,(TrapezoidalStates)Acc, true);
+			// initStopRecData();
 
-		initMoveByDegreeData(degreesToMove(90), -degreesToMove(90), Acc, Acc);
+		initMoveByDegreeData(degreesToMove(90), -degreesToMove(90), (TrapezoidalStates)Acc, (TrapezoidalStates)Acc);
 
-			initMoveByDegreeData(100,100,Acc,Acc, true);
-			initMoveByDegreeData(-100,-100,Acc,Acc, true);
-			initMoveByDegreeData(100,100,Acc,Acc, true);
-			initMoveByDegreeData(-100,-100,Acc,Acc, true);
-			initStopRecData();
-	}
+			// initMoveByDegreeData(100,100,(TrapezoidalStates)Acc,(TrapezoidalStates)Acc, true);
+			// initMoveByDegreeData(-100,-100,(TrapezoidalStates)Acc,(TrapezoidalStates)Acc, true);
+			// initMoveByDegreeData(100,100,(TrapezoidalStates)Acc,(TrapezoidalStates)Acc, true);
+			// initMoveByDegreeData(-100,-100,(TrapezoidalStates)Acc,(TrapezoidalStates)Acc, true);
+			// initStopRecData();
+	// }
 
 		//initMoveByDegreeData(distanceToDegrees(250), distanceToDegrees(450), Acc, Acc);
 
@@ -101,11 +101,11 @@ void runCommands(Bot bot)
 			
 			memcpy(&data, &command, sizeof(MoveAttachMotorData));
 
-			configure(data);
+			configure(&data);
 
-			if(!hasRan(data)) return;
+			if(!hasRan(&data)) return;
 
-			cleanup(data);
+			cleanup(&data);
 
 			finalize();
 
@@ -119,13 +119,13 @@ void runCommands(Bot bot)
 
 			memcpy(&data, &command, sizeof(RobotDrivetrainData));
 
-			configure(data);
+			configure(&data);
 
 
 
-			if(!hasRan(data)) return;
+			if(!hasRan(&data)) return;
 
-			cleanup(data);
+			cleanup(&data);
 
 			finalize();
 
@@ -145,11 +145,11 @@ void runCommands(Bot bot)
 
 			memcpy(&data, &command, sizeof(LineFollowData));
 
-			configure(data);
+			configure(&data);
 
-			if(!hasRan(data)) return;
+			if(!hasRan(&data)) return;
 
-			cleanup(&(LineFollowData)command);
+			cleanup(&data);
 
 			finalize();
 
@@ -163,11 +163,11 @@ void runCommands(Bot bot)
 
 			memcpy(&data, &command, sizeof(LineFollowData));
 
-			configure(data);
+			configure(&data);
 
-			if(!hasRan(data)) return;
+			if(!hasRan(&data)) return;
 
-			cleanup(&(LineFollowData)command);
+			cleanup(&data);
 
 			finalize();
 
@@ -180,11 +180,11 @@ void runCommands(Bot bot)
 
 			memcpy(&data, &command, sizeof(MoveAttachMotorData));
 
-			configure(data);
+			configure(&data);
 
-			if(!hasRan(data)) return;
+			if(!hasRan(&data)) return;
 
-			cleanup(data);
+			cleanup(&data);
 
 			finalize();
 
@@ -194,9 +194,14 @@ void runCommands(Bot bot)
 
 		case MoveByDegrees:
 		{
-			if(initiateStall(bot.left)||
-			initiateStall(bot.right)||
-			initiateStall(bot.center))
+
+			bool isLeftStalled = initiateStall((MotorData&)bot.left);
+			bool isRightStalled = initiateStall((MotorData&)bot.right);
+			bool isCenterStalled = initiateStall((MotorData&)bot.center);
+
+			if(isLeftStalled ||
+			   isRightStalled ||
+			   isCenterStalled)
 			{
 				bot.isRecovery = true;
 			}
@@ -205,11 +210,11 @@ void runCommands(Bot bot)
 
 			memcpy(&data, &command, sizeof(RobotDrivetrainData));
 
-			configure(data);
+			configure(&data);
 
-			if(!hasRan(data)) return;
+			if(!hasRan(&data)) return;
 
-			cleanup(data);
+			cleanup(&data);
 
 			finalize();
 		}
@@ -246,9 +251,9 @@ void RecoveryChecker(bool& isCheckForRecovery, int startindex, int endindex)
 
 int main()
 {
-	bot.left.motorPort = vexMotorGroup(LeftFrontChassisMotor, LeftBackChassisMotor);
-	bot.right.motorPort = vexMotorGroup(RightFrontChassisMotor, RightBackChassisMotor);
-	bot.center.motorPort = vexMotorGroup(rightArmMotor, leftArmMotor);
+	bot.left.motorPort.initVexMotorGroup(LeftFrontChassisMotor, LeftBackChassisMotor);
+	bot.right.motorPort.initVexMotorGroup(RightFrontChassisMotor, RightBackChassisMotor);
+	bot.center.motorPort.initVexMotorGroup(rightArmMotor, leftArmMotor);
 	bot.left.profile.previousPosition = 0;
 	bot.right.profile.previousPosition = 0;
 	bot.center.profile.previousPosition = 0;
@@ -258,15 +263,14 @@ int main()
 	
 	bot.isCheckForRecovery = false;
 	bot.isRecovery = false;
-	clearDebugStream();
 	createCommands();
 
 	while(true)
 	{
 
 
-		trackVelocity(bot.left);
-		trackVelocity(bot.right);
+		trackVelocity((MotorData&)bot.left);
+		trackVelocity((MotorData&)bot.right);
 
 
 		//if(SensorValue[sonar] < 24 && !bot.isRecovery && bot.isCheckForRecovery)
@@ -276,9 +280,7 @@ int main()
 		//}
 
 		RecoveryChecker(bot.isCheckForRecovery, 0, 40);
-		displayTextLine(6, "Bot: %i", bot.index);
-		runCommands(bot);
-		displayTextLine(2, "IsRecovery: %i", bot.isRecovery);
+		runCommands((Bot&)bot);
 
 
 		realTime();

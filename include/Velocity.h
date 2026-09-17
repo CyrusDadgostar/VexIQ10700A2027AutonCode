@@ -13,13 +13,13 @@ int EncoderDifference(MotorData data)
 	return data.motorPort.rotation()-data.previousEncoderValue;
 }
 
-void trackVelocity(MotorData data)
+void trackVelocity(MotorData& data)
 {
-	if(time1.time(msec) - data.previousTime >= UPDATE_CYCLE_IN_MILLISECONDS)
+	if(time1.time(vex::msec) - data.previousTime >= UPDATE_CYCLE_IN_MILLISECONDS)
 	{
 		data.velocity = (float)(EncoderDifference(data)*40.0);
 		data.previousEncoderValue = data.motorPort.position();
-		data.previousTime = time1[T1];
+		data.previousTime = time1.time(vex::msec);
 	}
 }
 
@@ -33,12 +33,10 @@ bool initiateStall(MotorData& motorData)
 	{
 		if(abs(motorData.velocity) >= checkStallThreshold)
 		{
-			writeDebugStreamLine("Velocity: %0.2f", motorData.velocity);
 			return false;
 		}
 		else
 		{
-			writeDebugStreamLine("Stalling: %0.8f, Motor: %i", motorData.velocity, motorData.motorPort);
 			return true;
 		}
 	}
@@ -48,7 +46,7 @@ bool initiateStall(MotorData& motorData)
 		if(abs(motorData.velocity) > startStallCheckThreshold)// also make it an and so that after it passes a certain velocity (1) it should then initiate
 		{
 			motorData.stallData.isInitiated = true;
-			motorData.stallData.previousTime = time3.time(msec);
+			motorData.stallData.previousTime = time3.time(vex::msec);
 			motorData.stallData.isPassed = true;
 		}
 	}
@@ -64,8 +62,8 @@ void realTime()
 {
 
 	int mask = INTERVAL - 1;
-	int timeRemainder = mask & time3.time(msec);
-	delay(INTERVAL - timeRemainder);
+	int timeRemainder = mask & (int)time3.time(vex::msec);
+	vexDelay(INTERVAL - timeRemainder);
 }
 
 

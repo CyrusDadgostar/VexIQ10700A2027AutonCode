@@ -16,18 +16,14 @@ void resetCurrentPosition(MotorData& data)
 {
 	data.profile.previousPosition = data.motorPort.position();
 	data.profile.isConfigured = true;
-	writeDebugStreamLine("Previous Position: %i", data.profile.previousPosition);
 }
-
 int getcurrentPosition(MotorData& data)
 {
 	return data.motorPort.position() - data.profile.previousPosition;
 }
-
 bool accelerate(MotorData& data)
 {
 	int realEncoder = data.motorPort.position();
-	writeDebugStreamLine("Real: %i", realEncoder);
 	int currentPosition = getcurrentPosition(data);
 	if(abs(currentPosition) >= abs(data.profile.accDuration))
 	{
@@ -60,9 +56,7 @@ bool stayAtSameSpeed(MotorData& data)
 
 bool decelerate(MotorData& data)
 {
-	int currentPosition = getcurrentPosition(data); // No absolute value. Also, this should be a function, you shouldn't have this in 3 separate places
-	writeDebugStreamLine("current: %i", currentPosition);
-	writeDebugStreamLine("total: %i", data.profile.totalDuration);
+	int currentPosition = getcurrentPosition(data); 
 
 	if(abs(currentPosition) >= abs(data.profile.totalDuration))
 	{
@@ -102,7 +96,7 @@ bool initTrapezoidalProfileData(MotorData& data, short totalDuration, Trapezoida
 	data.profile.totalDuration = totalDuration;
 	data.profile.accDuration = ACCELERATION_DURATION;
 	data.profile.dccDuration = DECELERATION_DURATION;
-	data.profile.maxPower = 100;
+	data.profile.maxPower = 100; // why not a define? 
 	data.profile.previousPosition = data.motorPort.position();
 	data.profile.isConfigured = true;
 	return true;
@@ -127,7 +121,7 @@ bool runMotorData(MotorData& data)
 			bool isDone = accelerate(data);
 			if(isDone)
 			{
-				data.profile.state = Coast;
+				data.profile.state = (TrapezoidalStates)Coast;
 			}
 		}
 			break;
@@ -137,7 +131,7 @@ bool runMotorData(MotorData& data)
 			bool isDone = stayAtSameSpeed(data);
 			if(isDone)
 			{
-				data.profile.state = Dcc;
+				data.profile.state = (TrapezoidalStates)Dcc;
 			}
 		}
 			break;

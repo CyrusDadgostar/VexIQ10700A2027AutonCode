@@ -1,4 +1,5 @@
 #include "BaseCommand.h"
+#include "vex.h"
 
 int sgn(float val) {
     return (0 < val) - (val < 0);
@@ -15,11 +16,11 @@ struct vexMotorGroup
 {
 	vex::motor firstMotor;
 	vex::motor secondMotor;
-
-	vexMotorGroup() : firstMotor(), secondMotor() {}
-	vexMotorGroup(vex::motor firstMotor, vex::motor secondMotor)
-		: firstMotor(firstMotor), secondMotor(secondMotor)
+	
+	void initVexMotorGroup(vex::motor firstPort, vex::motor secondPort)
 	{
+		firstMotor = firstPort;
+		secondMotor = secondPort;
 	}
 
 	void stopMotors()
@@ -33,8 +34,10 @@ struct vexMotorGroup
 	}
 	void spinMotors(int power)
 	{
-		firstMotor.spin((vex::directionType)forward, power, pct);
-		secondMotor.spin((vex::directionType)forward, power, pct);
+		firstMotor.setVelocity(power, vex::percent);
+		secondMotor.setVelocity(power, vex::percent);
+		firstMotor.spin((vex::directionType)vex::forward);
+		secondMotor.spin((vex::directionType)vex::forward);
 	}
 	void spin(int power)
 	{
@@ -42,7 +45,7 @@ struct vexMotorGroup
 	}
 	float positionOfMotors()
 	{
-		return (firstMotor.position(degrees) + secondMotor.position(degrees))/2;
+		return (firstMotor.position(vex::degrees) + secondMotor.position(vex::degrees))/2;
 	}
 	float position()
 	{
@@ -54,8 +57,8 @@ struct vexMotorGroup
 	}
 	void setPositionOfMotors(int position)
 	{
-		firstMotor.setPosition(position, degrees);
-		secondMotor.setPosition(position, degrees);
+		firstMotor.setPosition(position, vex::degrees);
+		secondMotor.setPosition(position, vex::degrees);
 	}
 	void setPosition(int position)
 	{
@@ -103,8 +106,8 @@ struct Bot
 	MotorData center;
 };
 
-timer time1 = timer();
-timer time2 = timer();
-timer time3 = timer();
+vex::timer time1 = vex::timer();
+vex::timer time2 = vex::timer();
+vex::timer time3 = vex::timer();
 
 Bot bot;
