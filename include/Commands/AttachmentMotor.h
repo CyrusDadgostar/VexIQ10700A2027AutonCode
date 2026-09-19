@@ -3,17 +3,16 @@ struct MoveAttachMotorData
 {
 	CommandType commandType;
 	bool isConfigured;
-	byte power;
+	uint8_t power;
 	unsigned short duration;
 };
 
-void initMoveAttachMotorData(byte power, unsigned short duration, bool isRecovery = false)
+void initMoveAttachMotorData(uint8_t power, unsigned short duration, bool isRecovery = false)
 {
 	VERIFY(sizeof(MoveAttachMotorData) <= sizeof(BaseCommand));
 
 	MoveAttachMotorData data;
-	data.commandType = isRecovery ? AttachMotorRec : AttachMotor;
-	writeDebugStreamLine("data: %i", data.commandType);
+	data.commandType = isRecovery ? (CommandType)AttachMotorRec : (CommandType)AttachMotor;
 	data.isConfigured = false;
 
 	data.power = power;
@@ -22,7 +21,6 @@ void initMoveAttachMotorData(byte power, unsigned short duration, bool isRecover
 	memcpy(&bot.commands[bot.index], &data, sizeof(MoveAttachMotorData));
 
 	bot.index++;
-	writeDebugStreamLine("NextCommand: %i CommandType: %i", bot.index, bot.commands[bot.index].commandType);
 
 }
 
@@ -32,7 +30,7 @@ void configure(MoveAttachMotorData* data)
 
 	data->isConfigured = true;
 
-	BaseCommand* command = &bot.commands[bot.index];
+	BaseCommand* command = (BaseCommand*)&bot.commands[bot.index];
 	memcpy(command, data, sizeof(MoveAttachMotorData));
 
 	bot.center.motorPort.setPosition(0);
@@ -44,10 +42,10 @@ bool hasRan(MoveAttachMotorData* data)
 	{
 		return true;
 	}
-	bot.center.motorPort.spin(forward, data->power);
+	bot.center.motorPort.spin((double)data->power);
 
 
-	BaseCommand* command = &bot.commands[bot.index];
+	BaseCommand* command = (BaseCommand*)&bot.commands[bot.index];
 	memcpy(command, data, sizeof(MoveAttachMotorData));
 	return false;
 }

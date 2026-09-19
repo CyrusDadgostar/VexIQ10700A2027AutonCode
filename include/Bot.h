@@ -1,3 +1,4 @@
+#pragma once
 #include "BaseCommand.h"
 #include "vex.h"
 
@@ -14,8 +15,8 @@ enum TrapezoidalStates
 
 struct vexMotorGroup
 {
-	vex::motor firstMotor;
-	vex::motor secondMotor;
+	vex::motor firstMotor = vex::motor(vex::PORT1);
+	vex::motor secondMotor = vex::motor(vex::PORT2);
 	
 	void initVexMotorGroup(vex::motor firstPort, vex::motor secondPort)
 	{
