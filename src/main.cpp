@@ -243,6 +243,10 @@ int main()
 
 	rightArmMotor.setStopping(vex::brakeType::hold);
 	leftArmMotor.setStopping(vex::brakeType::hold);
+	LeftFrontChassisMotor.setStopping(vex::brakeType::hold);
+	LeftBackChassisMotor.setStopping(vex::brakeType::hold);
+	RightFrontChassisMotor.setStopping(vex::brakeType::hold);
+	RightBackChassisMotor.setStopping(vex::brakeType::hold);
 	bot.gyro = Gyro;
 	
 	bot.gyro.calibrate();
