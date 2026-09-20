@@ -1,5 +1,5 @@
 #pragma once
-#define MIN_POWER 5
+#define MIN_POWER 10
 
 #include "Bot.h"
 
