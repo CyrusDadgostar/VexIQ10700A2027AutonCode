@@ -33,7 +33,7 @@ void configure(TurnByGyroData* data)
 	data->isConfigured = true;
 
 	initTrapezoidalProfileData((MotorData&)bot.left, data->angle, data->leftState, ACCELERATION_DURATION, DECELERATION_DURATION, bot.gyro.rotation(degrees));
-	initTrapezoidalProfileData((MotorData&)bot.right, data->angle, data->rightState, ACCELERATION_DURATION, DECELERATION_DURATION, bot.gyro.rotation(degrees));
+	initTrapezoidalProfileData((MotorData&)bot.right, -data->angle, data->rightState, ACCELERATION_DURATION, DECELERATION_DURATION, bot.gyro.rotation(degrees));
 	motorDataChecksAndProcedures((MotorData&)bot.left);
 	motorDataChecksAndProcedures((MotorData&)bot.right);
 	resetCurrentPosition((MotorData&)bot.left, bot.gyro.rotation(degrees));
@@ -45,8 +45,8 @@ void configure(TurnByGyroData* data)
 
 bool hasRan(TurnByGyroData* data)
 {
-	bool isLeftDone = TrapezoidalProfileMoveByDegrees((MotorData&)bot.left, bot.gyro.rotation(degrees), (int)1);
-	bool isRightDone = TrapezoidalProfileMoveByDegrees((MotorData&)bot.right, bot.gyro.rotation(degrees), (int)-1);
+	bool isLeftDone = TrapezoidalProfileMoveByDegrees((MotorData&)bot.left, bot.gyro.rotation(degrees));
+	bool isRightDone = TrapezoidalProfileMoveByDegrees((MotorData&)bot.right, bot.gyro.rotation(degrees));
 
 	if(isLeftDone && isRightDone)
 	{

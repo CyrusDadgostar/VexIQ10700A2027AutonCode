@@ -19,7 +19,7 @@ int getcurrentPosition(MotorData& data, int currentPosition)
 {
 	return currentPosition - data.profile.previousPosition;
 }
-bool accelerate(MotorData& data, int sensorPosition, int direction)
+bool accelerate(MotorData& data, int sensorPosition)
 {
 	int currentPosition = getcurrentPosition(data, sensorPosition);
 	if(abs(currentPosition) >= abs(data.profile.accDuration))
@@ -31,9 +31,10 @@ bool accelerate(MotorData& data, int sensorPosition, int direction)
 
 	int power = (powerPercentage*(data.profile.maxPower-MIN_POWER))+MIN_POWER;
 
-	power = abs(power) * sgn(data.profile.totalDuration) * direction;
+	power = abs(power) * sgn(data.profile.totalDuration);
 
 	data.motorPort.spin(power);
+
 
 
 	return false;
@@ -51,7 +52,7 @@ bool stayAtSameSpeed(MotorData& data, int sensorPosition)
 	return false;
 }
 
-bool decelerate(MotorData& data, int sensorPosition, int direction)
+bool decelerate(MotorData& data, int sensorPosition)
 {
 	int currentPosition = getcurrentPosition(data, sensorPosition);
 
@@ -70,7 +71,7 @@ bool decelerate(MotorData& data, int sensorPosition, int direction)
 	int power = ((1-abs(adjustedPosition)/(float)DECELERATION_DURATION)*percentageValue)+MIN_POWER;
 
 
-	power = abs(power) * sgn(data.profile.totalDuration) * direction;
+	power = abs(power) * sgn(data.profile.totalDuration);
 
 	data.motorPort.spin(power);
 
@@ -108,13 +109,13 @@ void motorDataChecksAndProcedures(MotorData& data)
 	}
 }
 
-bool runMotorData(MotorData& data, short currentPosition, int direction)
+bool runMotorData(MotorData& data, short currentPosition)
 {
 	switch(data.profile.state)
 	{
 		case Acc:
 		{
-			bool isDone = accelerate(data, currentPosition, direction);
+			bool isDone = accelerate(data, currentPosition);
 			if(isDone)
 			{
 				data.profile.state = (TrapezoidalStates)Coast;
@@ -134,7 +135,7 @@ bool runMotorData(MotorData& data, short currentPosition, int direction)
 
 		case Dcc:
 		{
-			bool isDone = decelerate(data, currentPosition, direction);
+			bool isDone = decelerate(data, currentPosition);
 			if(isDone)
 			{
 				data.stallData.isInitiated = false;
@@ -146,9 +147,9 @@ bool runMotorData(MotorData& data, short currentPosition, int direction)
 	return false;
 }
 
-bool TrapezoidalProfileMoveByDegrees(MotorData& data, short currentPosition, int direction)
+bool TrapezoidalProfileMoveByDegrees(MotorData& data, short currentPosition)
 {
-	bool isDone = runMotorData(data, currentPosition, direction);
+	bool isDone = runMotorData(data, currentPosition);
 	if(isDone)
 	{
 		return true;
