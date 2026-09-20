@@ -15,7 +15,7 @@ void initTurnByGyroData(short angle, TrapezoidalStates leftState, TrapezoidalSta
 	VERIFY(commandSize <= sizeof(BaseCommand));
 
 	TurnByGyroData data;
-	data.commandType = isRecovery ? (CommandType)MoveByDegreesRec : (CommandType)MoveByDegrees;
+	data.commandType = (CommandType)TurnByGyro;
 	data.isConfigured = false;
 	data.angle = angle;
 	data.leftState = leftState;

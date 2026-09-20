@@ -27,7 +27,7 @@ bool accelerate(MotorData& data, int sensorPosition)
 		return true;
 	}
 
-	float powerPercentage = (float)abs(currentPosition)/abs(ACCELERATION_DURATION);
+	float powerPercentage = (float)abs(currentPosition)/abs(data.profile.accDuration);
 
 	int power = (powerPercentage*(data.profile.maxPower-MIN_POWER))+MIN_POWER;
 
@@ -64,11 +64,11 @@ bool decelerate(MotorData& data, int sensorPosition)
 
 	int maxpower = data.profile.maxPower;
 
-	int adjustedPosition = (abs(data.profile.totalDuration) - DECELERATION_DURATION) - abs(currentPosition);
-	int target = (abs(data.profile.totalDuration)-DECELERATION_DURATION);
+	int adjustedPosition = (abs(data.profile.totalDuration) - data.profile.dccDuration) - abs(currentPosition);
+	int target = (abs(data.profile.totalDuration)-data.profile.dccDuration);
 	int percentageValue = data.profile.maxPower - MIN_POWER;
 
-	int power = ((1-abs(adjustedPosition)/(float)DECELERATION_DURATION)*percentageValue)+MIN_POWER;
+	int power = ((1-abs(adjustedPosition)/(float)data.profile.dccDuration)*percentageValue)+MIN_POWER;
 
 
 	power = abs(power) * sgn(data.profile.totalDuration);
