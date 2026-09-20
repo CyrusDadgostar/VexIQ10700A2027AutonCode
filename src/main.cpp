@@ -65,7 +65,7 @@ void createCommands()
 			// initMoveByDegreeData(100,100,(TrapezoidalStates)Acc,(TrapezoidalStates)Acc, true);
 			// initMoveByDegreeData(-100,-100,(TrapezoidalStates)Acc,(TrapezoidalStates)Acc, true);
 			// initStopRecData();
-		
+		initMoveAttachMotorData(50, 1250);
 		initTurnByGyroData(90*RATIO, (TrapezoidalStates)Acc, (TrapezoidalStates)Acc);
 
 			// initMoveByDegreeData(100,100,(TrapezoidalStates)Acc,(TrapezoidalStates)Acc, true);
@@ -241,6 +241,9 @@ int main()
 	bot.left.profile.previousPosition = 0;
 	bot.right.profile.previousPosition = 0;
 	bot.center.profile.previousPosition = 0;
+
+	rightArmMotor.setStopping(vex::brakeType::hold);
+	leftArmMotor.setStopping(vex::brakeType::hold);
 	bot.gyro = Gyro;
 	
 	bot.gyro.calibrate();

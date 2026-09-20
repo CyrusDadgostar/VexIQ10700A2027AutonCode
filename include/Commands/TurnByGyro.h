@@ -45,8 +45,8 @@ void configure(TurnByGyroData* data)
 
 bool hasRan(TurnByGyroData* data)
 {
-	bool isLeftDone = TrapezoidalProfileMoveByDegrees((MotorData&)bot.left, bot.gyro.rotation(degrees));
-	bool isRightDone = TrapezoidalProfileMoveByDegrees((MotorData&)bot.right, bot.gyro.rotation(degrees));
+	bool isLeftDone = TrapezoidalProfileMoveByDegrees((MotorData&)bot.left, bot.gyro.rotation(degrees), (int)1);
+	bool isRightDone = TrapezoidalProfileMoveByDegrees((MotorData&)bot.right, bot.gyro.rotation(degrees), (int)-1);
 
 	if(isLeftDone && isRightDone)
 	{
