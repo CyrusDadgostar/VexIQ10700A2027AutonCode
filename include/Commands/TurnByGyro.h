@@ -33,7 +33,7 @@ void configure(TurnByGyroData* data)
 	data->isConfigured = true;
 
 	initTrapezoidalProfileData((MotorData&)bot.left, data->angle, data->leftState, ACCELERATION_DURATION, DECELERATION_DURATION, bot.gyro.rotation(degrees));
-	initTrapezoidalProfileData((MotorData&)bot.right, -data->angle, data->rightState, ACCELERATION_DURATION, DECELERATION_DURATION, bot.gyro.rotation(degrees));
+	initTrapezoidalProfileData((MotorData&)bot.right, data->angle, data->rightState, ACCELERATION_DURATION, DECELERATION_DURATION, bot.gyro.rotation(degrees));
 	motorDataChecksAndProcedures((MotorData&)bot.left);
 	motorDataChecksAndProcedures((MotorData&)bot.right);
 	resetCurrentPosition((MotorData&)bot.left, bot.gyro.rotation(degrees));

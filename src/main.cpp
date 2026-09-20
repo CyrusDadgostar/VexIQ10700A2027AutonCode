@@ -66,7 +66,7 @@ void createCommands()
 			// initMoveByDegreeData(-100,-100,(TrapezoidalStates)Acc,(TrapezoidalStates)Acc, true);
 			// initStopRecData();
 		
-		initTurnByGyroData(90, (TrapezoidalStates)Acc, (TrapezoidalStates)Acc);
+		initTurnByGyroData(90*RATIO, (TrapezoidalStates)Acc, (TrapezoidalStates)Acc);
 
 			// initMoveByDegreeData(100,100,(TrapezoidalStates)Acc,(TrapezoidalStates)Acc, true);
 			// initMoveByDegreeData(-100,-100,(TrapezoidalStates)Acc,(TrapezoidalStates)Acc, true);
