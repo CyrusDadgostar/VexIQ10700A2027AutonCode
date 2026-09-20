@@ -105,6 +105,7 @@ struct Bot
 	MotorData left;
 	MotorData right;
 	MotorData center;
+	vex::inertial gyro;
 };
 
 vex::timer time1 = vex::timer();

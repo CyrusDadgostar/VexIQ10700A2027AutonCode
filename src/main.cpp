@@ -65,8 +65,8 @@ void createCommands()
 			// initMoveByDegreeData(100,100,(TrapezoidalStates)Acc,(TrapezoidalStates)Acc, true);
 			// initMoveByDegreeData(-100,-100,(TrapezoidalStates)Acc,(TrapezoidalStates)Acc, true);
 			// initStopRecData();
-
-		initMoveByDegreeData(degreesToMove(90/RATIO), -degreesToMove(90/RATIO), (TrapezoidalStates)Acc, (TrapezoidalStates)Acc);
+		
+		initTurnByGyroData(90, (TrapezoidalStates)Acc, (TrapezoidalStates)Acc);
 
 			// initMoveByDegreeData(100,100,(TrapezoidalStates)Acc,(TrapezoidalStates)Acc, true);
 			// initMoveByDegreeData(-100,-100,(TrapezoidalStates)Acc,(TrapezoidalStates)Acc, true);
@@ -175,6 +175,34 @@ void runCommands(Bot bot)
 		}
 		break;
 
+		case TurnByGyro:
+		{
+
+			bool isLeftStalled = initiateStall((MotorData&)bot.left);
+			bool isRightStalled = initiateStall((MotorData&)bot.right);
+			bool isCenterStalled = initiateStall((MotorData&)bot.center);
+
+			if(isLeftStalled ||
+			   isRightStalled ||
+			   isCenterStalled)
+			{
+				bot.isRecovery = true;
+			}
+
+			TurnByGyroData data;
+
+			memcpy(&data, &command, sizeof(TurnByGyroData));
+
+			configure(&data);
+
+			if(!hasRan(&data)) return;
+
+			cleanup(&data);
+
+			finalize();
+		}
+		break;
+
 		case StopRecovery:
 		{
 			bot.isRecovery = false;
@@ -186,6 +214,7 @@ void runCommands(Bot bot)
 			bot.left.motorPort.stop();
 			bot.right.motorPort.stop();
 			bot.center.motorPort.stop();
+			printf("STOP COMMAND REACHED\n");
 		}
 		break;
 	}
@@ -212,8 +241,10 @@ int main()
 	bot.left.profile.previousPosition = 0;
 	bot.right.profile.previousPosition = 0;
 	bot.center.profile.previousPosition = 0;
+	bot.gyro = Gyro;
 	
-
+	bot.gyro.calibrate();
+	bot.gyro.setHeading(0, rotationUnits::deg);
 	
 	
 	bot.isCheckForRecovery = false;
@@ -222,7 +253,8 @@ int main()
 
 	while(true)
 	{
-
+		printf("Bot Index: %d\n", bot.index);
+		printf("Heading: %d\n", bot.gyro.rotation(degrees));
 
 		trackVelocity((MotorData&)bot.left);
 		trackVelocity((MotorData&)bot.right);
