@@ -1,6 +1,8 @@
 #pragma once
 #define MIN_POWER 10
 
+#define MAX_POWER 100
+
 #include "Bot.h"
 
 //Every time you use nMotorEncoder, subtract the previous position so that everything work
@@ -27,7 +29,7 @@ bool accelerate(MotorData& data, int sensorPosition)
 		return true;
 	}
 
-	float powerPercentage = (float)abs(currentPosition)/abs(data.profile.accDuration);
+	float powerPercentage = (float)abs(currentPosition)/abs(ACCELERATION_DURATION);
 
 	int power = (powerPercentage*(data.profile.maxPower-MIN_POWER))+MIN_POWER;
 
@@ -43,7 +45,7 @@ bool accelerate(MotorData& data, int sensorPosition)
 bool stayAtSameSpeed(MotorData& data, int sensorPosition)
 {
 	int currentPosition = getcurrentPosition(data, sensorPosition);
-	int trapezoidalB1 = abs(data.profile.totalDuration)-data.profile.dccDuration;
+	int trapezoidalB1 = abs(data.profile.totalDuration)-DECELERATION_DURATION;
 	if(abs(currentPosition) >= abs(trapezoidalB1))
 	{
 		return true;
@@ -68,7 +70,7 @@ bool decelerate(MotorData& data, int sensorPosition)
 	int target = (abs(data.profile.totalDuration)-data.profile.dccDuration);
 	int percentageValue = data.profile.maxPower - MIN_POWER;
 
-	int power = ((1-abs(adjustedPosition)/(float)data.profile.dccDuration)*percentageValue)+MIN_POWER;
+	int power = ((1-abs(adjustedPosition)/(float)DECELERATION_DURATION)*percentageValue)+MIN_POWER;
 
 
 	power = abs(power) * sgn(data.profile.totalDuration);
@@ -93,7 +95,7 @@ bool initTrapezoidalProfileData(MotorData& data, short totalDuration, Trapezoida
 	data.profile.totalDuration = totalDuration;
 	data.profile.accDuration = accDuration;
 	data.profile.dccDuration = dccDuration;
-	data.profile.maxPower = 100; // why not a define? 
+	data.profile.maxPower = MAX_POWER; // why not a define? 
 	data.profile.previousPosition = prevPosition;
 	data.profile.isConfigured = true;
 	return true;

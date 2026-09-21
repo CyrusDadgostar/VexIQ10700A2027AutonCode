@@ -58,7 +58,7 @@ void createCommands()
 
 	// for(int i = 0; i < 4; i++)
 	// {
-		// initMoveByDegreeData(distanceToDegrees(100), distanceToDegrees(100), (TrapezoidalStates)Acc, (TrapezoidalStates)Acc);
+		initMoveByDegreeData(-distanceToDegrees(100), -distanceToDegrees(100), (TrapezoidalStates)Acc, (TrapezoidalStates)Acc);
 
 			// initMoveByDegreeData(100,100,(TrapezoidalStates)Acc,(TrapezoidalStates)Acc, true);
 			// initMoveByDegreeData(-100,-100,(TrapezoidalStates)Acc,(TrapezoidalStates)Acc, true);
@@ -248,9 +248,15 @@ int main()
 	RightFrontChassisMotor.setStopping(vex::brakeType::hold);
 	RightBackChassisMotor.setStopping(vex::brakeType::hold);
 	bot.gyro = Gyro;
-	
+	armSolenoid.pumpOff();
 	bot.gyro.calibrate();
-	bot.gyro.setHeading(0, rotationUnits::deg);
+	while(bot.gyro.isCalibrating())
+	{
+		printf("Gyro is calibrating\n");
+	}
+	armSolenoid.pumpOn();
+	bot.gyro.resetHeading();
+	bot.gyro.resetRotation();
 	
 	
 	bot.isCheckForRecovery = false;
@@ -260,7 +266,13 @@ int main()
 	while(true)
 	{
 		printf("Bot Index: %d\n", bot.index);
-		printf("Heading: %d\n", bot.gyro.rotation(degrees));
+
+
+		int gyroRotation = (int)bot.gyro.rotation(vex::rotationUnits::deg);
+		printf("Rotation: %d\n", gyroRotation);
+
+		Brain.Screen.printAt(1, 20, "Gyro: %d                                 ", gyroRotation);
+
 
 		trackVelocity((MotorData&)bot.left);
 		trackVelocity((MotorData&)bot.right);

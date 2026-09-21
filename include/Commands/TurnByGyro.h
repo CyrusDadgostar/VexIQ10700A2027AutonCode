@@ -1,5 +1,5 @@
-#define ACCELERATION_DURATION 15
-#define DECELERATION_DURATION 15
+#define ACCELERATION_DURATION 45
+#define DECELERATION_DURATION 45
 #include "TrapezoidalProfile.h"
 struct TurnByGyroData
 {
