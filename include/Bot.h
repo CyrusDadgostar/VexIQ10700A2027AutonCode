@@ -42,6 +42,14 @@ struct vexMotorGroup
 	}
 	void spin(int power)
 	{
+		if(power > 100)
+		{
+			power = 100;
+		}
+		else if(power < -100)
+		{
+			power = -100;
+		}
 		spinMotors(power);
 	}
 	float positionOfMotors()
@@ -105,6 +113,7 @@ struct Bot
 	MotorData left;
 	MotorData right;
 	MotorData center;
+	vex::inertial Gyro;
 };
 
 vex::timer time1 = vex::timer();

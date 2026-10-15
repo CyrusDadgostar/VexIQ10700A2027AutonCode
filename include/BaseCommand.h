@@ -8,6 +8,7 @@ enum CommandType
 {
 	MoveByDegrees = 0x00,
 	AttachMotor = 0x01,
+	TurnByGyro = 0x02,
 	AttachMotorRec = 0x81,
 	NoOperation = 0x03,
 	Trapezoidal = 0x04,

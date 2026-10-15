@@ -21,12 +21,12 @@ void finalize()
 
 int distanceToDegrees(int mm)
 {
-	return (mm*180)/(M_PI*RADIUS_OF_WHEEL);
+	return ((mm*180)/(M_PI*RADIUS_OF_WHEEL))/RATIO;
 }
 
 float degreesToMove(int angle)
 {
  	float length = RADIUS_OF_ROBOT * angle;
  	float degrees = length/RADIUS_OF_WHEEL;
- 	return degrees;
+ 	return degrees/RATIO;
 }
