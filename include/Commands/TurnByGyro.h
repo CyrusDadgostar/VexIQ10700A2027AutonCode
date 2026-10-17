@@ -49,11 +49,18 @@ bool hasRan(TurnByGyroData* data)
     printf("Gyro rotation: %d, angle: %d\n", gyroRotation, data->angle);
     switch(data->gyroState)
     {
-        case 0:
+        case 0: //make enum state for this instead of int
         {
-            
-            bot.right.motorPort.spin(sgn(data->angle)*(abs(bot.Gyro.rotation())+MIN_POWER));
-            bot.left.motorPort.spin(-sgn(data->angle)*(abs(bot.Gyro.rotation())+MIN_POWER));
+            float powerPercentage = (float)abs(bot.Gyro.rotation())/abs(ACCELERATION_DURATION);
+
+            int power = (powerPercentage*(100-MIN_POWER))+MIN_POWER;
+
+            power = abs(power) * sgn(data->angle);
+
+            bot.left.motorPort.spin(-power);
+
+            bot.right.motorPort.spin(power);
+           
             if(abs(bot.Gyro.rotation()) <= abs(data->angle)/2) return false;
             
             changeState(data->gyroState, 1);
@@ -64,9 +71,19 @@ bool hasRan(TurnByGyroData* data)
         case 1:
         {
            
-            int error = abs(data->angle) - abs(bot.Gyro.rotation());
-            bot.left.motorPort.spin(-sgn(data->angle)*(error));
-            bot.right.motorPort.spin(sgn(data->angle)*(error));
+            int adjustedPosition = (abs(data->angle) - data->angle/2) - abs(bot.Gyro.rotation());
+            int target = (abs(data->angle)-data->angle/2);
+            int percentageValue = 100 - MIN_POWER;
+
+            int power = ((1-abs(adjustedPosition)/(float)DECELERATION_DURATION)*percentageValue)+MIN_POWER;
+
+            int direction = sgn(data->angle);
+
+            power = abs(power) * direction;
+
+            bot.left.motorPort.spin(-power);
+
+            bot.right.motorPort.spin(power);
             if(abs(bot.Gyro.rotation()) <= abs(data->angle)) return false;
 
             return true;
