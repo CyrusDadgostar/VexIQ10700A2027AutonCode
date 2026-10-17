@@ -71,7 +71,7 @@ bool hasRan(TurnByGyroData* data)
         case 1:
         {
            
-            int adjustedPosition = (abs(data->angle) - data->angle/2) - abs(bot.Gyro.rotation());
+            int adjustedPosition = (abs(data->angle) - data->angle/2) - abs(bot.Gyro.rotation()); //increase data->angle/2 to something else for better scaling
             int target = (abs(data->angle)-data->angle/2);
             int percentageValue = 100 - MIN_POWER;
 
