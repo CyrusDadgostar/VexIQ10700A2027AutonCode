@@ -1,13 +1,19 @@
 #include "bot.h"
 #pragma once
-#define MIN_POWER 10
+#define MIN_POWER 5
 struct TurnByGyroData
 {
 	CommandType commandType;
 	bool isConfigured;
     unsigned short gyroState;
-	unsigned short angle;
+	short angle;
 };
+
+void changeState(unsigned short& state, unsigned short newState)
+{
+    printf("CurrState: %d, NewState: %d\n", state, newState);
+    state = newState;
+}
 
 void initTurnByGyroData( unsigned short angle, bool isRecovery = false)
 {
@@ -34,35 +40,48 @@ void configure(TurnByGyroData* data)
 	BaseCommand* command = (BaseCommand*)&bot.commands[bot.index];
 	memcpy(command, data, sizeof(TurnByGyroData));
 
-	bot.center.motorPort.setPosition(0);
+	bot.Gyro.setRotation(0, rotationUnits::deg);
 }
 
 bool hasRan(TurnByGyroData* data)
 {
+    int gyroRotation = bot.Gyro.rotation();
+    printf("Gyro rotation: %d, angle: %d\n", gyroRotation, data->angle);
     switch(data->gyroState)
     {
         case 0:
         {
-            bot.right.motorPort.spin(-bot.Gyro.rotation()-MIN_POWER);
-            bot.left.motorPort.spin(bot.Gyro.rotation()+MIN_POWER);
-            if(bot.Gyro.rotation() < data->angle/2) return false;
-
-            data->gyroState = 1;
+            
+            bot.right.motorPort.spin(sgn(data->angle)*(abs(bot.Gyro.rotation())+MIN_POWER));
+            bot.left.motorPort.spin(-sgn(data->angle)*(abs(bot.Gyro.rotation())+MIN_POWER));
+            if(abs(bot.Gyro.rotation()) <= abs(data->angle)/2) return false;
+            
+            changeState(data->gyroState, 1);
+           
         }
         break;
 
         case 1:
         {
-            int error = data->angle - bot.Gyro.rotation();
-            bot.left.motorPort.spin(error+MIN_POWER);
-            bot.right.motorPort.spin(-error-MIN_POWER);
-            if(bot.center.motorPort.position() < data->angle) return false;
+           
+            int error = abs(data->angle) - abs(bot.Gyro.rotation());
+            bot.left.motorPort.spin(-sgn(data->angle)*(error));
+            bot.right.motorPort.spin(sgn(data->angle)*(error));
+            if(abs(bot.Gyro.rotation()) <= abs(data->angle)) return false;
 
             return true;
         }
         break;
     }
 
+
+    // if(bot.Gyro.rotation() > data->angle) return true;
+    
+        
+    // bot.left.motorPort.spin(MIN_POWER);
+    // bot.right.motorPort.spin(-MIN_POWER);
+    // return false;
+    
 	BaseCommand* command = (BaseCommand*)&bot.commands[bot.index];
 	memcpy(command, data, sizeof(TurnByGyroData));
 	return false;

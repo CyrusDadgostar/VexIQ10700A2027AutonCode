@@ -34,7 +34,7 @@ vex::controller Controller;
 vex::timer Timer;
 
 //Gyro
-vex::inertial Gyro;
+vex::inertial Gyro = vex::inertial();
 
 vex::touchled touchLED(PORT4);
 
@@ -65,8 +65,9 @@ void createCommands()
 			// initMoveByDegreeData(100,100,(TrapezoidalStates)Acc,(TrapezoidalStates)Acc, true);
 			// initMoveByDegreeData(-100,-100,(TrapezoidalStates)Acc,(TrapezoidalStates)Acc, true);
 			// initStopRecData();
+		initMoveByDegreeData(distanceToDegrees(100), distanceToDegrees(100), (TrapezoidalStates)Acc, (TrapezoidalStates)Acc);
 
-		initMoveByDegreeData(degreesToMove(90), -degreesToMove(90), (TrapezoidalStates)Acc, (TrapezoidalStates)Acc);
+		initTurnByGyroData(-80);
 
 			// initMoveByDegreeData(100,100,(TrapezoidalStates)Acc,(TrapezoidalStates)Acc, true);
 			// initMoveByDegreeData(-100,-100,(TrapezoidalStates)Acc,(TrapezoidalStates)Acc, true);
@@ -175,6 +176,22 @@ void runCommands(Bot bot)
 		}
 		break;
 
+		case TurnByGyro:
+		{
+			TurnByGyroData data;
+
+			memcpy(&data, &command, sizeof(TurnByGyroData));
+
+			configure(&data);
+
+			if(!hasRan(&data)) return;
+
+			cleanup(&data);
+
+			finalize();
+		}
+		break;
+
 		case StopRecovery:
 		{
 			bot.isRecovery = false;
@@ -206,12 +223,15 @@ void RecoveryChecker(bool& isCheckForRecovery, int startindex, int endindex)
 
 int main()
 {
+	printf("\033[2J");
 	bot.left.motorPort.initVexMotorGroup(LeftFrontChassisMotor, LeftBackChassisMotor);
 	bot.right.motorPort.initVexMotorGroup(RightFrontChassisMotor, RightBackChassisMotor);
 	bot.center.motorPort.initVexMotorGroup(rightArmMotor, leftArmMotor);
 	bot.left.profile.previousPosition = 0;
 	bot.right.profile.previousPosition = 0;
 	bot.center.profile.previousPosition = 0;
+
+	bot.Gyro = Gyro;
 	
 
 	
