@@ -1,15 +1,22 @@
 #include "bot.h"
 #pragma once
-#define MIN_POWER 5
+#define MIN_POWER 10
+
+enum TriangleState
+{
+    AccT,
+    DccT
+};
+
 struct TurnByGyroData
 {
 	CommandType commandType;
 	bool isConfigured;
-    unsigned short gyroState;
+    TriangleState gyroState;
 	short angle;
 };
 
-void changeState(unsigned short& state, unsigned short newState)
+void changeState(TriangleState& state, TriangleState newState)
 {
     printf("CurrState: %d, NewState: %d\n", state, newState);
     state = newState;
@@ -22,7 +29,7 @@ void initTurnByGyroData( unsigned short angle, bool isRecovery = false)
 	TurnByGyroData data;
 	data.commandType = (CommandType)TurnByGyro;
 	data.isConfigured = false;
-	data.gyroState = 0;
+	data.gyroState = AccT;
 	data.angle = angle;
 
 	memcpy(&bot.commands[bot.index], &data, sizeof(TurnByGyroData));
@@ -49,11 +56,9 @@ bool hasRan(TurnByGyroData* data)
     printf("Gyro rotation: %d, angle: %d\n", gyroRotation, data->angle);
     switch(data->gyroState)
     {
-        case 0: //make enum state for this instead of int
+        case AccT:
         {
-            float powerPercentage = (float)abs(bot.Gyro.rotation())/abs(ACCELERATION_DURATION);
-
-            int power = (powerPercentage*(100-MIN_POWER))+MIN_POWER;
+            int power = MIN_POWER;
 
             power = abs(power) * sgn(data->angle);
 
@@ -63,19 +68,15 @@ bool hasRan(TurnByGyroData* data)
            
             if(abs(bot.Gyro.rotation()) <= abs(data->angle)/2) return false;
             
-            changeState(data->gyroState, 1);
+            changeState(data->gyroState, DccT);
            
         }
         break;
 
-        case 1:
+        case DccT:
         {
            
-            int adjustedPosition = (abs(data->angle) - data->angle/2) - abs(bot.Gyro.rotation()); //increase data->angle/2 to something else for better scaling
-            int target = (abs(data->angle)-data->angle/2);
-            int percentageValue = 100 - MIN_POWER;
-
-            int power = ((1-abs(adjustedPosition)/(float)DECELERATION_DURATION)*percentageValue)+MIN_POWER;
+            int power;
 
             int direction = sgn(data->angle);
 
