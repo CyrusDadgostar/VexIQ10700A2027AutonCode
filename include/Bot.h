@@ -75,7 +75,7 @@ struct vexMotorGroup
 	}
 };
 
-struct Claw
+struct EndEff
 {
 	vex::pneumatic clawPneumatic = vex::pneumatic(vex::PORT3);
 	void initClaw(vex::pneumatic clawPort)
@@ -123,7 +123,7 @@ struct Bot
 	MotorData right;
 	MotorData center;
 	vex::inertial Gyro;
-	Claw claw;
+	EndEff claw;
 };
 
 vex::timer time1 = vex::timer();

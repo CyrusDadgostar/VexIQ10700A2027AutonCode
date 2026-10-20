@@ -21,7 +21,7 @@ vex::motor LeftFrontChassisMotor(PORT2, true);
 vex::motor LeftBackChassisMotor(PORT7, false);
 
 // Pneumatics
-vex::pneumatic armSolenoid(PORT10);
+vex::pneumatic armSolenoid(PORT6);
 
 // Sensors
 vex::gyro firstStageArmGyro(PORT5);
@@ -49,6 +49,8 @@ vex::optical OpticalSensor(PORT11);
 #define RADIUS_OF_WHEEL 30
 #define RATIO 3.0
 
+#define ARM_RATIO 3/16
+
 #include "MyHeaders.h"
 
 
@@ -66,8 +68,10 @@ void createCommands()
 			// initMoveByDegreeData(-100,-100,(TrapezoidalStates)Acc,(TrapezoidalStates)Acc, true);
 			// initStopRecData();
 
-		initTurnByGyroData(-75);
-		initMoveByDegreeData(distanceToDegrees(100), distanceToDegrees(100), (TrapezoidalStates)Acc, (TrapezoidalStates)Acc);
+			initTurnByGyroData(90);
+			initMoveByDegreeData(distanceToDegrees(685), distanceToDegrees(685), Acc, Acc);
+			initMoveAttachMotorData(120*ARM_RATIO);
+			initSetPneumatic
 
 			// initMoveByDegreeData(100,100,(TrapezoidalStates)Acc,(TrapezoidalStates)Acc, true);
 			// initMoveByDegreeData(-100,-100,(TrapezoidalStates)Acc,(TrapezoidalStates)Acc, true);
@@ -135,6 +139,24 @@ void runCommands(Bot bot)
 			MoveAttachMotorData data;
 
 			memcpy(&data, &command, sizeof(MoveAttachMotorData));
+
+			configure(&data);
+
+			if(!hasRan(&data)) return;
+
+			cleanup(&data);
+
+			finalize();
+
+
+		}
+		break;
+
+		case SetPneumatic:
+		{
+			SetPneumaticData data;
+
+			memcpy(&data, &command, sizeof(SetPneumaticData));
 
 			configure(&data);
 
@@ -232,6 +254,8 @@ int main()
 	bot.center.profile.previousPosition = 0;
 
 	bot.Gyro = Gyro;
+
+	bot.claw.initClaw(armSolenoid);
 	
 
 	

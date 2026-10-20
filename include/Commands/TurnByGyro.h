@@ -1,6 +1,6 @@
 #include "bot.h"
 #pragma once
-#define MIN_POWER 10
+#define MIN_POWER 15
 
 enum TriangleState
 {
@@ -30,7 +30,7 @@ void initTurnByGyroData( unsigned short angle, bool isRecovery = false)
 	data.commandType = (CommandType)TurnByGyro;
 	data.isConfigured = false;
 	data.gyroState = AccT;
-	data.angle = angle;
+	data.angle = sgn(angle) == -1 ? angle-10 : angle+10;
 
 	memcpy(&bot.commands[bot.index], &data, sizeof(TurnByGyroData));
 
@@ -54,51 +54,52 @@ bool hasRan(TurnByGyroData* data)
 {
     int gyroRotation = bot.Gyro.rotation();
     printf("Gyro rotation: %d, angle: %d\n", gyroRotation, data->angle);
-    switch(data->gyroState)
-    {
-        case AccT:
-        {
-            int power = MIN_POWER;
+    // switch(data->gyroState)
+    // {
+    //     case AccT:
+    //     {
+    //         int power = MIN_POWER;
 
-            power = abs(power) * sgn(data->angle);
+    //         power = abs(power) * sgn(data->angle);
 
-            bot.left.motorPort.spin(-power);
+    //         bot.left.motorPort.spin(-power);
 
-            bot.right.motorPort.spin(power);
+    //         bot.right.motorPort.spin(power);
            
-            if(abs(bot.Gyro.rotation()) <= abs(data->angle)/2) return false;
+    //         if(abs(bot.Gyro.rotation()) <= abs(data->angle)/2) return false;
             
-            changeState(data->gyroState, DccT);
+    //         changeState(data->gyroState, DccT);
            
-        }
-        break;
+    //     }
+    //     break;
 
-        case DccT:
-        {
+    //     case DccT:
+    //     {
            
-            int power;
+    //         int power;
 
-            int direction = sgn(data->angle);
+    //         int direction = sgn(data->angle);
 
-            power = abs(power) * direction;
+    //         power = abs(power) * direction;
 
-            bot.left.motorPort.spin(-power);
+    //         bot.left.motorPort.spin(-power);
 
-            bot.right.motorPort.spin(power);
-            if(abs(bot.Gyro.rotation()) <= abs(data->angle)) return false;
+    //         bot.right.motorPort.spin(power);
+    //         if(abs(bot.Gyro.rotation()) <= abs(data->angle)) return false;
 
-            return true;
-        }
-        break;
-    }
+    //         return true;
+    //     }
+    //     break;
+    // }
 
 
-    // if(bot.Gyro.rotation() > data->angle) return true;
+    if(abs(bot.Gyro.rotation()) > abs(data->angle)) return true;
     
-        
-    // bot.left.motorPort.spin(MIN_POWER);
-    // bot.right.motorPort.spin(-MIN_POWER);
-    // return false;
+    int direction = sgn(data->angle);    
+
+    bot.left.motorPort.spin(direction * MIN_POWER);
+    bot.right.motorPort.spin(-direction * MIN_POWER);
+
     
 	BaseCommand* command = (BaseCommand*)&bot.commands[bot.index];
 	memcpy(command, data, sizeof(TurnByGyroData));
