@@ -1,7 +1,6 @@
 #include "bot.h"
 #pragma once
-#define MIN_POWER 15
-
+#define MIN_POWER 12
 enum TriangleState
 {
     AccT,
@@ -30,7 +29,7 @@ void initTurnByGyroData( unsigned short angle, bool isRecovery = false)
 	data.commandType = (CommandType)TurnByGyro;
 	data.isConfigured = false;
 	data.gyroState = AccT;
-	data.angle = sgn(angle) == -1 ? angle-10 : angle+10;
+	data.angle = angle;
 
 	memcpy(&bot.commands[bot.index], &data, sizeof(TurnByGyroData));
 
@@ -92,13 +91,28 @@ bool hasRan(TurnByGyroData* data)
     //     break;
     // }
 
+    int direction = sgn(data->angle);
 
-    if(abs(bot.Gyro.rotation()) > abs(data->angle)) return true;
+    if(abs(bot.Gyro.rotation()) < abs(data->angle/10))
+    {
+        bot.left.motorPort.spin(direction * MIN_POWER+5);
+        bot.right.motorPort.spin(-direction * MIN_POWER+5);
+    }
+    else if(abs(bot.Gyro.rotation()) < abs(data->angle))
+    {
+        bot.left.motorPort.spin(direction * MIN_POWER);
+        bot.right.motorPort.spin(-direction * MIN_POWER);
+    }
+    else
+    {
+        return true;
+    }
+
+
     
-    int direction = sgn(data->angle);    
+        
 
-    bot.left.motorPort.spin(direction * MIN_POWER);
-    bot.right.motorPort.spin(-direction * MIN_POWER);
+    
 
     
 	BaseCommand* command = (BaseCommand*)&bot.commands[bot.index];

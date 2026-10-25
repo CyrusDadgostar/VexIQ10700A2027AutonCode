@@ -22,6 +22,8 @@ struct vexMotorGroup
 	{
 		firstMotor = firstPort;
 		secondMotor = secondPort;
+		firstMotor.setStopping(brakeType::hold);
+		secondMotor.setStopping(brakeType::hold);
 	}
 
 	void stopMotors()
