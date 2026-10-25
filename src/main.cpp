@@ -71,7 +71,7 @@ void createCommands()
 			initTurnByGyroData(90);
 			initMoveByDegreeData(distanceToDegrees(685), distanceToDegrees(685), Acc, Acc);
 			initMoveAttachMotorData(120*ARM_RATIO);
-			initSetPneumatic
+			
 
 			// initMoveByDegreeData(100,100,(TrapezoidalStates)Acc,(TrapezoidalStates)Acc, true);
 			// initMoveByDegreeData(-100,-100,(TrapezoidalStates)Acc,(TrapezoidalStates)Acc, true);
