@@ -83,6 +83,7 @@ struct EndEff
 	void initClaw(vex::pneumatic clawPort)
 	{
 		clawPneumatic = clawPort;
+		clawPneumatic.pumpOn();
 	}
 };
 

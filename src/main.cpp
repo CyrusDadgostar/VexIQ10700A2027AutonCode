@@ -265,9 +265,7 @@ int main()
 
 	
 
-	Brain.playSound(soundType::alarm);
-	vexDelay(1);
-	//bot.claw.clawPneumatic.pumpOn();
+	Brain.playSound(soundType::alarm2);
 
 	bot.claw.initClaw(armSolenoid);
 	
