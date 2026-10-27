@@ -22,6 +22,8 @@ struct vexMotorGroup
 	{
 		firstMotor = firstPort;
 		secondMotor = secondPort;
+		firstMotor.setStopping(brakeType::hold);
+		secondMotor.setStopping(brakeType::hold);
 	}
 
 	void stopMotors()
@@ -81,6 +83,7 @@ struct EndEff
 	void initClaw(vex::pneumatic clawPort)
 	{
 		clawPneumatic = clawPort;
+		clawPneumatic.pumpOn();
 	}
 };
 

@@ -12,8 +12,8 @@ using namespace vex;
 vex::brain Brain;
 
 // Motors
-vex::motor rightArmMotor(PORT9, true);
-vex::motor leftArmMotor(PORT3, false);
+vex::motor rightArmMotor(PORT10, true);
+vex::motor leftArmMotor(PORT4, false);
 
 vex::motor RightFrontChassisMotor(PORT8, false);
 vex::motor RightBackChassisMotor(PORT1, true);
@@ -49,7 +49,7 @@ vex::optical OpticalSensor(PORT11);
 #define RADIUS_OF_WHEEL 30
 #define RATIO 3.0
 
-#define ARM_RATIO 3/16
+#define ARM_RATIO 16/3
 
 #include "MyHeaders.h"
 
@@ -66,12 +66,18 @@ void createCommands()
 			// initMoveByDegreeData(-100,-100,(TrapezoidalStates)Acc,(TrapezoidalStates)Acc, true);
 			// initMoveByDegreeData(100,100,(TrapezoidalStates)Acc,(TrapezoidalStates)Acc, true);
 			// initMoveByDegreeData(-100,-100,(TrapezoidalStates)Acc,(TrapezoidalStates)Acc, true);
-			// initStopRecData();
-
-			initTurnByGyroData(90);
-			initMoveByDegreeData(distanceToDegrees(685), distanceToDegrees(685), Acc, Acc);
-			initMoveAttachMotorData(120*ARM_RATIO);
-			
+			// initStopRecData()
+			initSetPneumaticData(false, false);
+			initSetPneumaticData(false, false);
+			initMoveAttachMotorData(-100, 120*ARM_RATIO);
+			initTurnByGyroData(20);
+			initMoveByDegreeData(-distanceToDegrees(340), -distanceToDegrees(340), Acc, Acc);
+			initSetPneumaticData(false, true);
+			initMoveAttachMotorData(-100, 160*ARM_RATIO);
+			initSetPneumaticData(false, false);
+			initSetPneumaticData(true, false);
+			//initMoveAttachMotorData(100, 160*ARM_RATIO);
+			//initSetPneumaticData(true, true);
 
 			// initMoveByDegreeData(100,100,(TrapezoidalStates)Acc,(TrapezoidalStates)Acc, true);
 			// initMoveByDegreeData(-100,-100,(TrapezoidalStates)Acc,(TrapezoidalStates)Acc, true);
@@ -246,6 +252,7 @@ void RecoveryChecker(bool& isCheckForRecovery, int startindex, int endindex)
 int main()
 {
 	printf("\033[2J");
+	bot.claw.clawPneumatic.pumpOff();
 	bot.left.motorPort.initVexMotorGroup(LeftFrontChassisMotor, LeftBackChassisMotor);
 	bot.right.motorPort.initVexMotorGroup(RightFrontChassisMotor, RightBackChassisMotor);
 	bot.center.motorPort.initVexMotorGroup(rightArmMotor, leftArmMotor);
@@ -253,7 +260,12 @@ int main()
 	bot.right.profile.previousPosition = 0;
 	bot.center.profile.previousPosition = 0;
 
+
 	bot.Gyro = Gyro;
+
+	
+
+	Brain.playSound(soundType::alarm2);
 
 	bot.claw.initClaw(armSolenoid);
 	

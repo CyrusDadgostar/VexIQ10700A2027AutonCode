@@ -4,6 +4,7 @@
 
 const vex::cylinderType Claw = vex::cylinderType::cylinder1;
 const vex::cylinderType Wrist = vex::cylinderType::cylinder2;
+timer PneuTimer = timer();
 
 
 struct SetPneumaticData
@@ -25,7 +26,8 @@ void initSetPneumaticData(bool isClawExtended, bool isWristExtended, bool isReco
 	data.isClawExtended = isClawExtended;
 	data.isWristExtended = isWristExtended;
 
-	memcpy(&bot.commands[bot.index], &data, sizeof(SetPneumaticData));
+    BaseCommand* command = (BaseCommand*)&bot.commands[bot.index];
+	memcpy(command, &data, sizeof(SetPneumaticData));
 
 	bot.index++;
 
@@ -37,6 +39,8 @@ void configure(SetPneumaticData* data)
 
 	data->isConfigured = true;
 
+    PneuTimer.reset();
+
 	BaseCommand* command = (BaseCommand*)&bot.commands[bot.index];
 	memcpy(command, data, sizeof(SetPneumaticData));
 
@@ -44,9 +48,14 @@ void configure(SetPneumaticData* data)
 
 bool hasRan(SetPneumaticData* data)
 {
+    if(PneuTimer.time() < 100) 
+    {
+        return false;
+
+    }
     if(data->isClawExtended)
     {
-        
+        printf("extended Claw");
         bot.claw.clawPneumatic.extend(Claw);
     }
     else
