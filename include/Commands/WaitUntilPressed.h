@@ -13,11 +13,13 @@ void initWaitUntilPressedData(vex::color Color, uint8_t brightness)
 
 	WaitUntilLedPressedData data;
 
+	data.commandType = (CommandType)WaitUntilPressed;
+
     data.Color = Color;
     data.brightness = brightness;
 
 	memcpy(&bot.commands[bot.index], &data, sizeof(WaitUntilLedPressedData));
-
+	printf("Added WaitUntilPressed command at index %d\n", bot.index);
 	bot.index++;
 
 }
@@ -34,7 +36,9 @@ void configure(WaitUntilLedPressedData* data)
 
 bool hasRan(WaitUntilLedPressedData* data)
 {
-	while(!bot.button.Led.pressing())
+	bot.button.Led.setColor((vex::color)yellow);
+	bot.button.Led.setBrightness(100);
+	if(!bot.button.Led.pressing())
     {
         return false;
     }
