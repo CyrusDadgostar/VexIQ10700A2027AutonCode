@@ -4,7 +4,6 @@
 
 const vex::cylinderType Claw = vex::cylinderType::cylinder1;
 const vex::cylinderType Wrist = vex::cylinderType::cylinder2;
-timer PneuTimer = timer();
 
 
 struct SetPneumaticData
@@ -16,7 +15,7 @@ struct SetPneumaticData
 };
 
 
-void initSetPneumaticData(bool isClawExtended, bool isWristExtended, bool isRecovery = false)
+void initSetPneumaticData(bool isClawExtended, bool isWristExtended)
 {
 	VERIFY(sizeof(SetPneumaticData) <= sizeof(BaseCommand));
 
@@ -48,11 +47,11 @@ void configure(SetPneumaticData* data)
 
 bool hasRan(SetPneumaticData* data)
 {
-    if(PneuTimer.time() < 100) 
+    if(PneuTimer.time() < 500)
     {
         return false;
-
     }
+
     if(data->isClawExtended)
     {
         printf("extended Claw");
@@ -80,6 +79,7 @@ bool hasRan(SetPneumaticData* data)
 
 void cleanup(SetPneumaticData* data)
 {
+    
 	bot.left.motorPort.stop();
     bot.right.motorPort.stop();
     bot.center.motorPort.stop();

@@ -87,6 +87,15 @@ struct EndEff
 	}
 };
 
+struct Light
+{
+	vex::touchled Led = vex::touchled(PORT1);
+	void initLed(vex::touchled actualLed)
+	{
+		Led = actualLed;
+	}
+};
+
 struct StallData
 {
 	int previousTime;
@@ -127,10 +136,13 @@ struct Bot
 	MotorData center;
 	vex::inertial Gyro;
 	EndEff claw;
+	Light button;
 };
 
 vex::timer time1 = vex::timer();
 vex::timer time2 = vex::timer();
 vex::timer time3 = vex::timer();
+
+vex::timer PneuTimer = vex::timer();
 
 Bot bot;
