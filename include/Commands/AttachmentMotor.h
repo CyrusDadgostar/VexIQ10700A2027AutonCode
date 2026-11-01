@@ -3,11 +3,11 @@ struct MoveAttachMotorData
 {
 	CommandType commandType;
 	bool isConfigured;
-	uint8_t power;
+	int power;
 	unsigned short duration;
 };
 
-void initMoveAttachMotorData(uint8_t power, unsigned short duration, bool isRecovery = false)
+void initMoveAttachMotorData(int power, unsigned short duration, bool isRecovery = false)
 {
 	VERIFY(sizeof(MoveAttachMotorData) <= sizeof(BaseCommand));
 
@@ -42,7 +42,7 @@ bool hasRan(MoveAttachMotorData* data)
 	{
 		return true;
 	}
-	bot.center.motorPort.spin((double)data->power);
+	bot.center.motorPort.spin(data->power);
 
 
 	BaseCommand* command = (BaseCommand*)&bot.commands[bot.index];

@@ -25,7 +25,6 @@ vex::pneumatic armSolenoid(PORT5);
 
 // Sensors
 vex::gyro firstStageArmGyro(PORT6);
-vex::bumper backTouchSensor(PORT12);
 
 // Controller
 vex::controller Controller;
@@ -36,7 +35,7 @@ vex::timer Timer;
 //Gyro
 vex::inertial Gyro = vex::inertial();
 
-vex::touchled touchLED(PORT4);
+vex::touchled touchLED(PORT1);
 
 //vex::aivision AiVision(PORT2, aivision::ALL_AIOBJS);
 vex::optical OpticalSensor(PORT11);
@@ -67,15 +66,19 @@ void createCommands()
 			// initMoveByDegreeData(100,100,(TrapezoidalStates)Acc,(TrapezoidalStates)Acc, true);
 			// initMoveByDegreeData(-100,-100,(TrapezoidalStates)Acc,(TrapezoidalStates)Acc, true);
 			// initStopRecData()
+			// initWaitUntilPressedData(green, 50);
 			initSetPneumaticData(false, false);
 			initSetPneumaticData(false, false);
-			initMoveAttachMotorData(-100, 120*ARM_RATIO);
+			initMoveAttachMotorData(100, 120*ARM_RATIO);
 			initTurnByGyroData(20);
-			initMoveByDegreeData(-distanceToDegrees(340), -distanceToDegrees(340), Acc, Acc);
+			initMoveByDegreeData(-distanceToDegrees(370), -distanceToDegrees(370), Acc, Acc);
 			initSetPneumaticData(false, true);
-			initMoveAttachMotorData(-100, 160*ARM_RATIO);
-			initSetPneumaticData(false, false);
-			initSetPneumaticData(true, false);
+			initMoveAttachMotorData(100, 170*ARM_RATIO);
+			initSetPneumaticData(false, true);
+			initSetPneumaticData(true, true);
+			initSetPneumaticData(true, true);
+			initMoveAttachMotorData(-100, 170*ARM_RATIO);
+			initMoveByDegreeData(distanceToDegrees(200), distanceToDegrees(200), Acc, Acc);
 			//initMoveAttachMotorData(100, 160*ARM_RATIO);
 			//initSetPneumaticData(true, true);
 
@@ -220,6 +223,22 @@ void runCommands(Bot bot)
 		}
 		break;
 
+		case WaitUntilPressed:
+		{
+			WaitUntilLedPressedData data;
+
+			memcpy(&data, &command, sizeof(WaitUntilLedPressedData));
+
+			configure(&data);
+
+			if(!hasRan(&data)) return;
+
+			cleanup(&data);
+
+			finalize();
+		}
+		break;
+
 		case StopRecovery:
 		{
 			bot.isRecovery = false;
@@ -262,6 +281,8 @@ int main()
 
 
 	bot.Gyro = Gyro;
+
+	bot.button.initLed(touchLED);
 
 	
 
