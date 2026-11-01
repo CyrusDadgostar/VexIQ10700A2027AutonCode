@@ -4,12 +4,12 @@
 		"json": 2
 	},
 	"project": {
-		"name": "BasicAutonomous",
+		"name": "VexIQ10700A2027AutonCode",
 		"description": "Autonomous",
 		"creationDate": "8/15/2026, 7:18:46 PM",
 		"platform": "IQ2",
 		"language": "cpp",
-		"slot": 2,
+		"slot": 8,
 		"sdkVersion": "IQ2_20250520_15_00_00",
 		"cpp": {
 			"includePath": [],

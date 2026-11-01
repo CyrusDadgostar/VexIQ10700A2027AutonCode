@@ -1,29 +1,40 @@
-#define ACCELERATION_DURATION 45
-#define DECELERATION_DURATION 45
-#include "TrapezoidalProfile.h"
+#include "bot.h"
+#pragma once
+#define MIN_POWER 12
+enum TriangleState
+{
+    AccT,
+    DccT
+};
+
 struct TurnByGyroData
 {
 	CommandType commandType;
 	bool isConfigured;
-	TrapezoidalStates leftState;
-	TrapezoidalStates rightState;
+    TriangleState gyroState;
 	short angle;
 };
 
-void initTurnByGyroData(short angle, TrapezoidalStates leftState, TrapezoidalStates rightState, bool isRecovery = false)
+void changeState(TriangleState& state, TriangleState newState)
 {
-	VERIFY(commandSize <= sizeof(BaseCommand));
+    printf("CurrState: %d, NewState: %d\n", state, newState);
+    state = newState;
+}
+
+void initTurnByGyroData( unsigned short angle, bool isRecovery = false)
+{
+	VERIFY(sizeof(TurnByGyroData) <= sizeof(BaseCommand));
 
 	TurnByGyroData data;
 	data.commandType = (CommandType)TurnByGyro;
 	data.isConfigured = false;
+	data.gyroState = AccT;
 	data.angle = angle;
-	data.leftState = leftState;
-	data.rightState = rightState;
 
 	memcpy(&bot.commands[bot.index], &data, sizeof(TurnByGyroData));
 
 	bot.index++;
+
 }
 
 void configure(TurnByGyroData* data)
@@ -32,32 +43,86 @@ void configure(TurnByGyroData* data)
 
 	data->isConfigured = true;
 
-	initTrapezoidalProfileData((MotorData&)bot.left, data->angle, data->leftState, ACCELERATION_DURATION, DECELERATION_DURATION, bot.gyro.rotation(degrees));
-	initTrapezoidalProfileData((MotorData&)bot.right, -data->angle, data->rightState, ACCELERATION_DURATION, DECELERATION_DURATION, bot.gyro.rotation(degrees));
-	motorDataChecksAndProcedures((MotorData&)bot.left);
-	motorDataChecksAndProcedures((MotorData&)bot.right);
-	resetCurrentPosition((MotorData&)bot.left, bot.gyro.rotation(degrees));
-	resetCurrentPosition((MotorData&)bot.right, bot.gyro.rotation(degrees));
-
 	BaseCommand* command = (BaseCommand*)&bot.commands[bot.index];
 	memcpy(command, data, sizeof(TurnByGyroData));
+
+	bot.Gyro.setRotation(0, rotationUnits::deg);
 }
 
 bool hasRan(TurnByGyroData* data)
 {
-	bool isLeftDone = TrapezoidalProfileMoveByDegrees((MotorData&)bot.left, bot.gyro.rotation(degrees));
-	bool isRightDone = TrapezoidalProfileMoveByDegrees((MotorData&)bot.right, bot.gyro.rotation(degrees));
+    int gyroRotation = bot.Gyro.rotation();
+    printf("Gyro rotation: %d, angle: %d\n", gyroRotation, data->angle);
+    // switch(data->gyroState)
+    // {
+    //     case AccT:
+    //     {
+    //         int power = MIN_POWER;
 
-	if(isLeftDone && isRightDone)
-	{
-		return true;
-	}
+    //         power = abs(power) * sgn(data->angle);
 
+    //         bot.left.motorPort.spin(-power);
+
+    //         bot.right.motorPort.spin(power);
+           
+    //         if(abs(bot.Gyro.rotation()) <= abs(data->angle)/2) return false;
+            
+    //         changeState(data->gyroState, DccT);
+           
+    //     }
+    //     break;
+
+    //     case DccT:
+    //     {
+           
+    //         int power;
+
+    //         int direction = sgn(data->angle);
+
+    //         power = abs(power) * direction;
+
+    //         bot.left.motorPort.spin(-power);
+
+    //         bot.right.motorPort.spin(power);
+    //         if(abs(bot.Gyro.rotation()) <= abs(data->angle)) return false;
+
+    //         return true;
+    //     }
+    //     break;
+    // }
+
+    int direction = sgn(data->angle);
+
+    if(abs(bot.Gyro.rotation()) < abs(data->angle/10))
+    {
+        bot.left.motorPort.spin(direction * MIN_POWER+5);
+        bot.right.motorPort.spin(-direction * MIN_POWER+5);
+    }
+    else if(abs(bot.Gyro.rotation()) < abs(data->angle))
+    {
+        bot.left.motorPort.spin(direction * MIN_POWER);
+        bot.right.motorPort.spin(-direction * MIN_POWER);
+    }
+    else
+    {
+        return true;
+    }
+
+
+    
+        
+
+    
+
+    
+	BaseCommand* command = (BaseCommand*)&bot.commands[bot.index];
+	memcpy(command, data, sizeof(TurnByGyroData));
 	return false;
 }
 
 void cleanup(TurnByGyroData* data)
 {
 	bot.left.motorPort.stop();
-	bot.right.motorPort.stop();
+    bot.right.motorPort.stop();
+    bot.center.motorPort.stop();
 }

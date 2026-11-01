@@ -14,6 +14,7 @@ enum CommandType
 	MoveByDegreesRec = 0x82,
 	StopRecovery = 0x84,
 	Stop = 0x05,
+	WaitUntilPressed = 0x07,
 };
 
 struct BaseCommand

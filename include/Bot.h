@@ -22,6 +22,8 @@ struct vexMotorGroup
 	{
 		firstMotor = firstPort;
 		secondMotor = secondPort;
+		firstMotor.setStopping(brakeType::hold);
+		secondMotor.setStopping(brakeType::hold);
 	}
 
 	void stopMotors()
@@ -42,6 +44,14 @@ struct vexMotorGroup
 	}
 	void spin(int power)
 	{
+		if(power > 100)
+		{
+			power = 100;
+		}
+		else if(power < -100)
+		{
+			power = -100;
+		}
 		spinMotors(power);
 	}
 	float positionOfMotors()
@@ -64,6 +74,25 @@ struct vexMotorGroup
 	void setPosition(int position)
 	{
 		setPositionOfMotors(position);
+	}
+};
+
+struct EndEff
+{
+	vex::pneumatic clawPneumatic = vex::pneumatic(vex::PORT3);
+	void initClaw(vex::pneumatic clawPort)
+	{
+		clawPneumatic = clawPort;
+		clawPneumatic.pumpOn();
+	}
+};
+
+struct Light
+{
+	vex::touchled Led = vex::touchled(PORT1);
+	void initLed(vex::touchled actualLed)
+	{
+		Led = actualLed;
 	}
 };
 
@@ -105,11 +134,15 @@ struct Bot
 	MotorData left;
 	MotorData right;
 	MotorData center;
-	vex::inertial gyro;
+	vex::inertial Gyro;
+	EndEff claw;
+	Light button;
 };
 
 vex::timer time1 = vex::timer();
 vex::timer time2 = vex::timer();
 vex::timer time3 = vex::timer();
+
+vex::timer PneuTimer = vex::timer();
 
 Bot bot;

@@ -1,7 +1,7 @@
 #pragma once
-#define MIN_POWER 10
-
-#define MAX_POWER 100
+#define MIN_POWER 45
+#define ACCELERATION_DURATION 250
+#define DECELERATION_DURATION 250
 
 #include "Bot.h"
 
